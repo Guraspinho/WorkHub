@@ -1,14 +1,11 @@
-// change password 
-// edit company credentials
-
 const {getCompanyCredentials} = require('../db/dataBase');
 const {updatePassword, editCredentials,getCompanyId} = require('../db/companies');
+const {InsertSubscriptionPlan,billingInfo,countSubplan,editSubplan} = require('../db/subscription');
+const {countEmployees} = require('../db/employees');
 
 const {BadRequestError} = require("../errors/everyError");
 const {saltPassword,comparePasswords} = require('../middlewares/functions');
 const {StatusCodes} = require('http-status-codes');
-const {InsertSubscriptionPlan} = require('../db/subscription');
-const {countEmployees} = require('../db/employees');
 
 // change password
 
@@ -75,12 +72,77 @@ const addSubscription = async (req,res) =>
     {
         throw new BadRequestError('Must choose subscription plan');
     }
+    const planMustBeOne = await countSubplan(companies_id);
+    
+    if(planMustBeOne >= 1)
+    {
+        throw new BadRequestError('Company can not have more than one subscription plans');
+    }
     
     // check if provided plan is valid
     if(plan !== 'free' && plan !== 'basic' && plan !== 'premium')
     {
         throw new BadRequestError('Please provide valid subscription plan');
     }
+    if(plan === 'free')
+    {
+        price = 0;
+        priceByFiles = 0;
+        users = 1;
+        files = 10;
+    }
+    if(plan === 'basic')
+    {
+        price = 0;
+        priceByFiles = 0;
+        files = 100;
+        users = 10;
+    }
+    if(plan === 'premium')
+    {
+        price = 300
+        priceByFiles = 0.5;
+        employees = null;
+        files = 1000;
+    }
+
+
+    await InsertSubscriptionPlan(plan,price,priceByFiles,files,users,companies_id);
+    
+    res.status(StatusCodes.OK).json({msg: 'Subscription plan was added suecessfully'});
+}
+
+
+// get information about cpmpany's current billing
+const getBillingInfo = async (req,res) =>
+{
+    const {companies_id} = await getCompanyId(req.user.email);
+    const info = await billingInfo(companies_id);
+
+    res.status(StatusCodes.OK).json({msg:`Company currently uses `,info});
+}
+
+
+// edit billing / subscriptionplan
+const editBilling = async (req,res) =>
+{
+    const {plan} = req.body;
+
+    const {companies_id} = await getCompanyId(req.user.email);
+
+    let price;
+    let priceByFiles;
+    let files;
+    let users;
+
+    const info = await billingInfo(companies_id);
+   
+    if(plan === info.name)
+    {
+        throw new BadRequestError(`${plan} is already your current subscription plan`);
+    }
+    // i could create a function for choosing a plan but just copying it was easier and also doesnot hurt that much
+
     if(plan === 'free')
     {
         price = 0;
@@ -103,10 +165,9 @@ const addSubscription = async (req,res) =>
         files = 1000;
     }
 
+    await editSubplan(plan,price,priceByFiles,files,users,companies_id)
 
-    await InsertSubscriptionPlan(plan,price,priceByFiles,files,users,companies_id);
-    
-    res.send("Added subscription plan")
+    res.status(StatusCodes.OK).json({msg:"Subscription plan edited suecessfully"});
 }
 
 
@@ -115,19 +176,6 @@ const getAllFiles = async (req,res) =>
 {
     res.send('All files');
 }
-
-// get information about cpmpany's current billing
-const getBillingInfo = async (req,res) =>
-{
-    res.send('Billing info');
-}
-
-// edit billing / subscriptionplan
-const editBilling = async (req,res) =>
-{
-    res.send('Edit billing');
-}
-
 
 module.exports = 
 {
@@ -140,4 +188,3 @@ module.exports =
 
 }
 
-// add a subscription plan. get a plan from a req.body, 

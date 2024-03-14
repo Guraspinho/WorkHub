@@ -15,6 +15,7 @@ const {
     countEmployees } = require('../db/employees');
 
 const {getCompanyId} = require('../db/companies');
+const {billingInfo} = require('../db/subscription');
 
 //company can add employees, can delete them. added employees get sent an email, employees can not add edit or delete other employees
 
@@ -23,6 +24,19 @@ const {getCompanyId} = require('../db/companies');
 const addEmployees = async (req,res) =>
 {
     const {name,email} = req.body;
+
+    const {companies_id} = await getCompanyId(req.user.email);
+
+    const employees = await countEmployees(companies_id);
+
+    const info = await billingInfo(companies_id);
+
+    if(info.name === 'basic'|| info.name === 'free' && employees >= info.users+1)
+    {
+        throw new BadRequestError("Company reached limit of added employees");
+    }
+
+   
 
     if(!name || !email)
     {
@@ -44,8 +58,6 @@ const addEmployees = async (req,res) =>
         throw new BadRequestError('Please provide a valid Gmail address');
     }
 
-    // identify a company which added an employee
-    const {companies_id} = await getCompanyId(req.user.email);
 
     
     // Hash email
@@ -56,7 +68,7 @@ const addEmployees = async (req,res) =>
     await sendEmail(email,hashedEmail,'employees');
     
     
-    res.status(StatusCodes.OK).send('employee added');
+    res.status(StatusCodes.OK).json({msg:"Added employee suecessfully"});
 }
 
 
