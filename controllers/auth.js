@@ -12,7 +12,7 @@ const {companySignup, getCompanyCredentials, isVerified ,verify} = require('../d
 
 const signup = async (req,res) =>
 {   
-    // I am checking for en errors in a controller.
+
 
     const {name,email,password,country,industry} = req.body;
 

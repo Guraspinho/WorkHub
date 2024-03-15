@@ -3,6 +3,10 @@ require('dotenv').config();
 require('express-async-errors');
 
 
+// i was not able to finish the task complately, some things still need improvement and little code refactoring,
+// but overally authentication of companies as well as employees is 100% done, things left are file upload and 
+// subscription plan needs a little update, I think almost every error is handled and security is pretty solid.
+
 //import security packages
 const cors = require('cors');
 const helmet = require('helmet');
@@ -53,9 +57,9 @@ app.get('/', (req,res) =>
 // routes
 
 app.use(authRouter);
+app.use(authenticationMiddleware,administratorRouter);
 app.use('/employees',employeesRouter);
 app.use('/employees',upload.single("File"),fileUploadRouter);
-app.use(authenticationMiddleware,administratorRouter);
 
 
 
@@ -80,17 +84,3 @@ const start = async () =>
 
 start();
 
-
-
-// file upload - employees
-// change rights for a file - employees
-// get files - employees
-
-
-// get all files - administrator
-// get billing - administrator
-// edit billing - administrator
-
-
-// when i add an employee or a subscription plan, i also add an id of a company which they got added by
-// everytime i try to edit or delete or something like that first i check which company does it belong

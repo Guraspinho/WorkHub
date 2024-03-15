@@ -17,9 +17,12 @@ const {
 const {getCompanyId} = require('../db/companies');
 const {billingInfo} = require('../db/subscription');
 
-//company can add employees, can delete them. added employees get sent an email, employees can not add edit or delete other employees
+
 
 // add employees 
+
+// checking for errors in controllers
+
 
 const addEmployees = async (req,res) =>
 {
