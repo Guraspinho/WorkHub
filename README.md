@@ -1,12 +1,18 @@
-## SaaS backend application for Sweeft internship.
+# WorkHub
+Workhub is a company management API that allows companies to register, enabling company managers to add employees, and employees to upload files.
 
-REST API which is built using Node.js(Express.js) And MySQL.
+
+## Stack
+- Node.js
+- Express.js
+- MySql
 
 ## Features
 
-1. email confirmation.
-2. JWT.
-3. Security and validation.
-4. Cool error handling (Using OOP consepts like inheritance).
-5. Easily readable and maintainable code.
+- email confirmation using Google smtp.
+- Authorization and authentication using JWT.
+- Security and data validation.
+- file upload.
+- Advanced error handling (Using OOP consepts).
+
    
