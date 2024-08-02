@@ -1,5 +1,5 @@
 # WorkHub
-Workhub is a company management API that allows companies to register, enabling company managers to add employees, and employees to upload files.
+Workhub is a SaaS (Software as a Service) company management API designed to streamline organizational processes. It allows companies to register and efficiently manage their workforce and documents. The API is built using JavaScript and Express.js for the backend, and MySQL for database management.
 
 
 ## Stack
